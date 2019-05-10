@@ -183,6 +183,9 @@ type Path struct {
 	// Location two or more connected points to overlay on the image at specified
 	// locations
 	Location []LatLng
+	// UsePolylineEncoding permits to convert Path Location to an encoded polyline string
+	// https://developers.google.com/maps/documentation/maps-static/dev-guide#EncodedPolylines
+	UsePolylineEncoding bool
 }
 
 func (p Path) String() string {
@@ -204,8 +207,12 @@ func (p Path) String() string {
 		r = append(r, "geodesic:true")
 	}
 
-	for _, l := range p.Location {
-		r = append(r, l.String())
+	if p.UsePolylineEncoding && len(p.Location) > 0 {
+		r = append(r, fmt.Sprintf("enc:%s", Encode(p.Location)))
+	} else {
+		for _, l := range p.Location {
+			r = append(r, l.String())
+		}
 	}
 	return strings.Join(r, "|")
 }
